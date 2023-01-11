@@ -1,0 +1,56 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
+
+df = pd.read_csv("C:\\Users\\Michael\\Downloads\\META_price.csv")
+df.head()
+
+# To calculate returns, only need the 'Date' and 'Adj Close' information. Can ignore the others
+df = df[['Date', 'Adj Close']]
+
+df.head()
+
+# Rename the column names
+df.rename(columns={'Date': 'date', 'Adj Close': 'price_t'}, inplace=True)
+df.head()
+
+# Two ways to calculate returns. One is painful, one is easier. We are going to try the painful way first.
+
+# First, create another column for the price at 'price_t-1'
+df['price_t-1'] = df['price_t'].shift(1)
+df.head()
+
+# Using this approach, when we want to calculate returns using manual approach. Returns is equal to
+df['returns_manual'] = (df['price_t']/df['price_t-1']) -1
+
+# Take each value at price 'time_t' and divide by 't-1' then subtract 1
+df.head()
+df.tail()
+
+# The more fun way to calculate returns is to use the built in 'percent change' method to calculate the percent change in the 'price_t' column
+df['return_pct_change_method'] = df['price_t'].pct_change(1)
+df.head()
+
+df['returns'] = (df['price_t']/df['price_t-1']) -1
+df.head()
+
+# Now that we can calculate returns, let's do something more interesting by plotting the prices. We will first need to set the index for the date columns
+df.set_index('date', inplace=True)
+df.head()
+
+# Now let's plot the prices
+df['price_t'].plot(figsize=(12,8))
+
+# Based on a price graph, it appears that price is predictable, but this is not indicative of the returns associated with the price.
+df['returns'].plot(figsize=(12,8))
+
+# Looking at the returns you can see that returns on a day to day basis are completely random, ranging between +15% and -25%. Despite what
+# someone might tell you, the returns are difficult to predict on a daily basis. This is true of almost any stock you can think of. This
+# is because stocks follow what we call a 'random walk'. It's better to pick stocks based on 'expected returns' rather than 
+# 'historical returns' partly because of this truth. 
+
+# There are three main ways to calculate a stock's expected return.
+# 1. Using the stock's historic average return
+# 2. Using state-contingent weighted probabilities
+# 3. Using Asset Pricing Models (CAPM)
